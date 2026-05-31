@@ -71,6 +71,14 @@ Recommended one-notebook workflow:
 
 The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, copies the label metadata into the ignored local data folder, prepares a balanced subset, runs fast training experiments, and saves comparison results. It covers centralized PointGCN/RS-CNN, manual HFL IID/non-IID with FedAvg, VFL with XYZ/RGB split embeddings, and knowledge distillation.
 
+For longer runs where Colab may reset, use:
+
+```text
+notebooks/01_colab_safe_final_run.ipynb
+```
+
+That notebook restores the ZIP/subset from Google Drive when available, saves the 26 GB ZIP immediately after download, saves extracted `.ply` files and split CSVs immediately after preparation, and backs up outputs/checkpoints after each major experiment stage.
+
 Default notebook mode uses a fast synthetic point-cloud proxy derived from the labels. To move to real Cap3D `.ply` data:
 
 1. Put the selected Cap3D ZIP file in `data/raw/` on Colab, or set `DOWNLOAD_CAP3D_FILES=True`.
