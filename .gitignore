@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*:Zone.Identifier
+
+# DVC-tracked local metadata
+data/metadata/labeled_dataset.csv
+
+# Large data artifacts
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/.gitignore
+!data/raw/*.dvc
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/.gitignore
+!data/processed/*.dvc
+data/cache/*
+!data/cache/.gitkeep
+!data/cache/.gitignore
+!data/cache/*.dvc
+data/splits/*
+!data/splits/.gitkeep
+!data/splits/.gitignore
+!data/splits/*.dvc
+
+# Training artifacts
+checkpoints/
+outputs/
+runs/
+wandb/
+*.pt
+*.pth
+*.ckpt

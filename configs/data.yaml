@@ -1,0 +1,19 @@
+seed: 42
+device: auto
+num_points: 1024
+input_channels: 6
+batch_size: 32
+num_workers: 2
+subset_classes: 10
+samples_per_class: 100
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+paths:
+  metadata_csv: data/metadata/labeled_dataset.csv
+  raw_dir: data/raw
+  processed_dir: data/processed
+  cache_dir: data/cache
+  splits_dir: data/splits
+

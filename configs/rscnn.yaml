@@ -1,0 +1,13 @@
+model:
+  name: rscnn
+  num_classes: 10
+  input_channels: 6
+  hidden_dim: 128
+training:
+  epochs: 30
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  batch_size: 32
+  device: auto
+  seed: 42
+

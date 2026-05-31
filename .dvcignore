@@ -1,0 +1,10 @@
+# Ignore transient local files from DVC scans.
+.git/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+outputs/
+runs/
+wandb/
+
