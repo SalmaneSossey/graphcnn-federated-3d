@@ -9,7 +9,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-from src.data.ply_utils import read_ascii_ply_xyzrgb
+from src.data.ply_utils import read_ply_xyzrgb
 from src.data.preprocessing import normalize_xyz, sample_points
 
 
@@ -19,8 +19,6 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
     Expected metadata path: `data/metadata/labeled_dataset.csv`.
     Expected point-cloud storage: `data/raw` or `data/cache`.
 
-    TODO: finalize metadata column names after inspecting `labeled_dataset.csv`.
-    TODO: support binary PLY if required by the selected Cap3D files.
     TODO: add train-time augmentation once baseline loading is verified.
     """
 
@@ -31,7 +29,7 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         num_points: int = 1024,
         input_channels: int = 6,
         path_column: str | None = None,
-        label_column: str = "label",
+        label_column: str | None = None,
     ) -> None:
         self.metadata_csv = Path(metadata_csv)
         self.pointcloud_root = Path(pointcloud_root)
@@ -43,8 +41,16 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
             pd.read_csv(self.metadata_csv) if self.metadata_csv.exists() else pd.DataFrame()
         )
 
-        if not self.metadata.empty and self.path_column is None:
-            self.path_column = self._infer_path_column(self.metadata)
+        self.label_to_idx: dict[str, int] = {}
+
+        if not self.metadata.empty:
+            if self.path_column is None:
+                self.path_column = self._infer_path_column(self.metadata)
+            if self.label_column is None:
+                self.label_column = self._infer_label_column(self.metadata)
+            if self.label_column is not None and self.label_column != "label_idx":
+                labels = sorted(self.metadata[self.label_column].astype(str).unique())
+                self.label_to_idx = {label: idx for idx, label in enumerate(labels)}
 
     def __len__(self) -> int:
         return len(self.metadata)
@@ -58,8 +64,10 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         if self.label_column not in row:
             raise ValueError(f"Missing label column: {self.label_column}")
 
-        point_path = self.pointcloud_root / str(row[self.path_column])
-        points = read_ascii_ply_xyzrgb(point_path)
+        point_path = Path(str(row[self.path_column]))
+        if not point_path.is_absolute():
+            point_path = self.pointcloud_root / point_path
+        points = read_ply_xyzrgb(point_path)
         points = normalize_xyz(points)
         points = sample_points(points, self.num_points)
         if self.input_channels == 3:
@@ -67,12 +75,32 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         elif self.input_channels != 6:
             raise ValueError("input_channels must be 3 or 6 for the current scaffold.")
 
-        label = int(row[self.label_column])
+        label_value = row[self.label_column]
+        if self.label_column == "label_idx":
+            label = int(label_value)
+        else:
+            label = self.label_to_idx[str(label_value)]
         return torch.from_numpy(points).float(), label
 
     @staticmethod
     def _infer_path_column(metadata: pd.DataFrame) -> str | None:
-        candidates = ("path", "file_path", "filename", "file", "pointcloud", "point_cloud")
+        candidates = (
+            "file_path",
+            "ply_path",
+            "path",
+            "filename",
+            "file",
+            "pointcloud",
+            "point_cloud",
+        )
+        for candidate in candidates:
+            if candidate in metadata.columns:
+                return candidate
+        return None
+
+    @staticmethod
+    def _infer_label_column(metadata: pd.DataFrame) -> str | None:
+        candidates = ("label_idx", "label", "class", "category", "label_name")
         for candidate in candidates:
             if candidate in metadata.columns:
                 return candidate
@@ -86,5 +114,9 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
             "columns": list(self.metadata.columns),
             "label_column": self.label_column,
             "path_column": self.path_column,
+            "num_classes": (
+                int(self.metadata[self.label_column].nunique())
+                if self.label_column is not None and not self.metadata.empty
+                else 0
+            ),
         }
-

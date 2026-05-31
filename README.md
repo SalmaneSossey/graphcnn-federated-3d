@@ -71,6 +71,18 @@ Recommended one-notebook workflow:
 
 The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, copies the label metadata into the ignored local data folder, prepares a balanced subset, runs fast training experiments, and saves comparison results. It covers centralized PointGCN/RS-CNN, manual HFL IID/non-IID with FedAvg, VFL with XYZ/RGB split embeddings, and knowledge distillation.
 
+Default notebook mode uses a fast synthetic point-cloud proxy derived from the labels. To move to real Cap3D `.ply` data:
+
+1. Put the selected Cap3D ZIP file in `data/raw/` on Colab, or set `DOWNLOAD_CAP3D_FILES=True`.
+2. Set `PREPARE_REAL_SUBSET=True` to extract only the selected `.ply` files into `data/processed/pointclouds/`.
+3. Set `USE_REAL_POINT_CLOUDS=True` and rerun the training sections.
+
+The extraction script is also available directly:
+
+```bash
+python scripts/prepare_subset.py --subset-classes 10 --samples-per-class 100
+```
+
 Download selected Cap3D files only when you are ready:
 
 ```bash
