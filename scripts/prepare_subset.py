@@ -75,7 +75,8 @@ def select_balanced_subset(
 def index_zip_members(raw_dir: Path) -> dict[str, tuple[Path, str]]:
     """Map point-cloud IDs to ZIP members for selective extraction."""
     index: dict[str, tuple[Path, str]] = {}
-    zip_paths = sorted(raw_dir.glob("*.zip"))
+    zip_paths = sorted(raw_dir.rglob("*.zip"))
+    print(f"Found {len(zip_paths)} ZIP file(s) under {raw_dir}.")
     for zip_path in zip_paths:
         with zipfile.ZipFile(zip_path) as archive:
             for member in archive.namelist():
@@ -91,7 +92,7 @@ def extract_selected_pointclouds(subset: pd.DataFrame, raw_dir: Path, output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     zip_index = index_zip_members(raw_dir)
     if not zip_index:
-        print(f"No ZIP files with .ply members found in {raw_dir}.")
+        print(f"No ZIP files with .ply members found under {raw_dir}.")
         subset["extracted"] = False
         return subset
 
