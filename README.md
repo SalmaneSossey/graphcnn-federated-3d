@@ -68,13 +68,14 @@ Warning: do not commit raw datasets, extracted `.ply` files, processed datasets,
 
 ## Colab T4 Workflow
 
-Run the notebooks in this order:
+Recommended one-notebook workflow:
 
-1. `notebooks/00_colab_setup.ipynb`: clone/update the repo, install Colab-safe dependencies, verify T4 GPU, and run smoke tests.
-2. `notebooks/01_download_data_with_dvc.ipynb`: mount Google Drive, configure a Drive-backed DVC store, pull existing DVC artifacts, and add `labeled_dataset.csv` to DVC if present.
-3. `notebooks/02_data_sanity_check.ipynb`: inspect metadata, label counts, and the planned balanced subset.
+1. Open `notebooks/00_colab_run_all_google_drive.ipynb` in Google Colab.
+2. Select a T4 GPU runtime.
+3. Put `labeled_dataset.csv` in `MyDrive/graphcnn-federated-3d/labeled_dataset.csv`.
+4. Use `Runtime > Run all`.
 
-The Colab notebooks are designed for `Runtime > Run all`. The data notebook does not download or unzip the full Cap3D archive automatically.
+The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, configures a Drive-backed DVC store, pulls or adds the label metadata, runs sanity checks, and verifies the code. The older staged notebooks remain available as optional step-by-step references, but they are not required for the normal workflow.
 
 Download selected Cap3D files only when you are ready:
 
