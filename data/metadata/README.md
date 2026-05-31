@@ -6,9 +6,8 @@ Place `labeled_dataset.csv` here:
 data/metadata/labeled_dataset.csv
 ```
 
-The CSV is intentionally ignored by Git and should be tracked with DVC:
+The CSV is intentionally ignored by Git. Keep it in Google Drive or another private storage location, then copy it here before running Colab or local experiments:
 
 ```bash
-bash scripts/add_labeled_dataset_to_dvc.sh
+cp /path/to/labeled_dataset.csv data/metadata/labeled_dataset.csv
 ```
-

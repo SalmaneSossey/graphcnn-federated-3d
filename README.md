@@ -6,7 +6,7 @@ Each object is represented as a `.ply` point cloud. Points are expected to conta
 
 ## Project Overview
 
-The repository is designed for lightweight, reproducible experiments on Google Colab T4. The first implementation includes placeholders for the selected architectures and real utilities for configuration, metrics, checkpoints, DVC workflows, FedAvg, and distillation loss.
+The repository is designed for lightweight, reproducible experiments on Google Colab T4. The first implementation includes placeholders for the selected architectures and real utilities for configuration, metrics, checkpoints, FedAvg, and distillation loss.
 
 Chosen model families:
 
@@ -39,32 +39,26 @@ Local label metadata should live at:
 data/metadata/labeled_dataset.csv
 ```
 
-This file is ignored by Git and should be tracked with DVC.
+This file is ignored by Git. Keep it in Google Drive or another private storage location, then copy it into the repo when running experiments.
 
-## DVC Workflow
+## Data Workflow
 
-Initialize DVC locally:
+Keep GitHub code-only. Store private metadata and heavy data in Google Drive:
 
-```bash
-bash scripts/setup_dvc.sh
+```text
+MyDrive/graphcnn-federated-3d/labeled_dataset.csv
+MyDrive/graphcnn-federated-3d/raw/
+MyDrive/graphcnn-federated-3d/processed/
 ```
 
-Add the label metadata to DVC:
+For local runs, copy metadata into the ignored project path:
 
 ```bash
-bash scripts/add_labeled_dataset_to_dvc.sh
+mkdir -p data/metadata
+cp /path/to/labeled_dataset.csv data/metadata/labeled_dataset.csv
 ```
 
-Configure a remote manually before pushing data:
-
-```bash
-dvc remote add -d localstore /path/to/dvc-store
-# or: dvc remote add -d gdrive gdrive://<folder-id>
-# or: dvc remote add -d s3remote s3://<bucket>/<prefix>
-dvc push
-```
-
-Warning: do not commit raw datasets, extracted `.ply` files, processed datasets, checkpoints, `outputs/`, `runs/`, or `wandb/` to GitHub.
+Warning: do not commit label metadata, raw datasets, extracted `.ply` files, processed datasets, checkpoints, `outputs/`, `runs/`, or `wandb/` to GitHub.
 
 ## Colab T4 Workflow
 
@@ -75,7 +69,7 @@ Recommended one-notebook workflow:
 3. Put `labeled_dataset.csv` in `MyDrive/graphcnn-federated-3d/labeled_dataset.csv`.
 4. Use `Runtime > Run all`.
 
-The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, configures a Drive-backed DVC store, pulls or adds the label metadata, runs sanity checks, and verifies the code. The older staged notebooks remain available as optional step-by-step references, but they are not required for the normal workflow.
+The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, copies the label metadata into the ignored local data folder, runs sanity checks, and verifies the code. The older staged notebooks remain available as optional step-by-step references, but they are not required for the normal workflow.
 
 Download selected Cap3D files only when you are ready:
 
@@ -110,7 +104,7 @@ python scripts/run_distillation.py
 ## Repository Layout
 
 - `configs/`: experiment defaults.
-- `data/`: DVC-managed data roots and tracked README/placeholders.
+- `data/`: ignored local data roots and tracked README/placeholders.
 - `notebooks/`: Colab starter notebooks.
 - `src/`: reusable Python package.
 - `scripts/`: command-line workflows.
