@@ -68,16 +68,19 @@ Warning: do not commit raw datasets, extracted `.ply` files, processed datasets,
 
 ## Colab T4 Workflow
 
-1. Open `notebooks/00_colab_setup.ipynb`.
-2. Clone the repository and install `requirements-colab.txt`.
-3. Configure DVC credentials or pull from a configured remote.
-4. Download only the Cap3D files you need:
+Run the notebooks in this order:
+
+1. `notebooks/00_colab_setup.ipynb`: clone/update the repo, install Colab-safe dependencies, verify T4 GPU, and run smoke tests.
+2. `notebooks/01_download_data_with_dvc.ipynb`: mount Google Drive, configure a Drive-backed DVC store, pull existing DVC artifacts, and add `labeled_dataset.csv` to DVC if present.
+3. `notebooks/02_data_sanity_check.ipynb`: inspect metadata, label counts, and the planned balanced subset.
+
+The Colab notebooks are designed for `Runtime > Run all`. The data notebook does not download or unzip the full Cap3D archive automatically.
+
+Download selected Cap3D files only when you are ready:
 
 ```bash
 python scripts/download_cap3d.py --data-dir data/raw
 ```
-
-Do not unzip the full dataset blindly on Colab. Build a balanced representative subset first.
 
 Colab already includes a CUDA-enabled PyTorch build, so avoid reinstalling
 `torch` there unless you have a specific reason.
