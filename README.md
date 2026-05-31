@@ -69,7 +69,7 @@ Recommended one-notebook workflow:
 3. Put `labeled_dataset.csv` in `MyDrive/graphcnn-federated-3d/labeled_dataset.csv`.
 4. Use `Runtime > Run all`.
 
-The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, copies the label metadata into the ignored local data folder, runs sanity checks, and verifies the code. The older staged notebooks remain available as optional step-by-step references, but they are not required for the normal workflow.
+The notebook clones or updates the GitHub repo, mounts Google Drive, installs Colab-safe dependencies, copies the label metadata into the ignored local data folder, prepares a balanced subset, runs fast training experiments, and saves comparison results. It covers centralized PointGCN/RS-CNN, manual HFL IID/non-IID with FedAvg, VFL with XYZ/RGB split embeddings, and knowledge distillation.
 
 Download selected Cap3D files only when you are ready:
 
@@ -105,7 +105,7 @@ python scripts/run_distillation.py
 
 - `configs/`: experiment defaults.
 - `data/`: ignored local data roots and tracked README/placeholders.
-- `notebooks/`: Colab starter notebooks.
+- `notebooks/`: the single Colab run-all workflow.
 - `src/`: reusable Python package.
 - `scripts/`: command-line workflows.
 - `reports/`: report assets and French template.
