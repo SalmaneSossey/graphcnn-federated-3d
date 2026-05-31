@@ -77,7 +77,7 @@ For longer runs where Colab may reset, use:
 notebooks/01_colab_safe_final_run.ipynb
 ```
 
-That notebook restores the ZIP/subset from Google Drive when available, saves the 26 GB ZIP immediately after download, saves extracted `.ply` files and split CSVs immediately after preparation, and backs up outputs/checkpoints after each major experiment stage.
+That notebook restores the extracted subset from Google Drive when available, downloads the 26 GB ZIP only into the temporary Colab runtime if needed, saves extracted `.ply` files and split CSVs immediately after preparation, and backs up outputs/checkpoints after each major experiment stage. The ZIP is not saved to Drive because free Drive storage is usually only 15 GB.
 
 Default notebook mode uses a fast synthetic point-cloud proxy derived from the labels. To move to real Cap3D `.ply` data:
 
