@@ -13,6 +13,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
@@ -26,12 +28,25 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser."""
     config = load_config("configs/data.yaml")
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--metadata-csv", type=Path, default=Path(config["paths"]["metadata_csv"]))
-    parser.add_argument("--raw-dir", type=Path, default=Path(config["paths"]["raw_dir"]))
-    parser.add_argument("--output-dir", type=Path, default=Path("data/processed/pointclouds"))
-    parser.add_argument("--splits-dir", type=Path, default=Path(config["paths"]["splits_dir"]))
-    parser.add_argument("--subset-classes", type=int, default=int(config["subset_classes"]))
-    parser.add_argument("--samples-per-class", type=int, default=int(config["samples_per_class"]))
+    parser.add_argument(
+        "--metadata-csv", type=Path, default=Path(config["paths"]["metadata_csv"])
+    )
+    parser.add_argument(
+        "--raw-dir", type=Path, default=Path(config["paths"]["raw_dir"])
+    )
+    parser.add_argument(
+        "--output-dir", type=Path, default=Path("data/processed/pointclouds")
+    )
+    parser.add_argument(
+        "--splits-dir", type=Path, default=Path(config["paths"]["splits_dir"])
+    )
+    parser.add_argument("--images-dir", type=Path, default=Path("images"))
+    parser.add_argument(
+        "--subset-classes", type=int, default=int(config["subset_classes"])
+    )
+    parser.add_argument(
+        "--samples-per-class", type=int, default=int(config["samples_per_class"])
+    )
     parser.add_argument("--seed", type=int, default=int(config["seed"]))
     parser.add_argument("--id-column", default="id")
     parser.add_argument("--label-column", default="label")
@@ -56,7 +71,9 @@ def select_balanced_subset(
     frame = metadata[[id_column, label_column]].copy()
     frame[id_column] = frame[id_column].astype(str)
     frame["label_name"] = frame[label_column].astype(str)
-    chosen_labels = frame["label_name"].value_counts().head(subset_classes).index.tolist()
+    chosen_labels = (
+        frame["label_name"].value_counts().head(subset_classes).index.tolist()
+    )
     subset = (
         frame[frame["label_name"].isin(chosen_labels)]
         .sample(frac=1.0, random_state=seed)
@@ -65,7 +82,9 @@ def select_balanced_subset(
         .sample(frac=1.0, random_state=seed)
         .reset_index(drop=True)
     )
-    label_to_idx = {label: idx for idx, label in enumerate(sorted(subset["label_name"].unique()))}
+    label_to_idx = {
+        label: idx for idx, label in enumerate(sorted(subset["label_name"].unique()))
+    }
     subset["label_idx"] = subset["label_name"].map(label_to_idx).astype(int)
     subset["file_path"] = subset[id_column] + ".ply"
     subset = subset.rename(columns={id_column: "id"})
@@ -87,7 +106,9 @@ def index_zip_members(raw_dir: Path) -> dict[str, tuple[Path, str]]:
     return index
 
 
-def extract_selected_pointclouds(subset: pd.DataFrame, raw_dir: Path, output_dir: Path) -> pd.DataFrame:
+def extract_selected_pointclouds(
+    subset: pd.DataFrame, raw_dir: Path, output_dir: Path
+) -> pd.DataFrame:
     """Extract selected `.ply` files from available ZIP archives."""
     output_dir.mkdir(parents=True, exist_ok=True)
     zip_index = index_zip_members(raw_dir)
@@ -97,7 +118,9 @@ def extract_selected_pointclouds(subset: pd.DataFrame, raw_dir: Path, output_dir
         return subset
 
     extracted_flags: list[bool] = []
-    for row in tqdm(subset.itertuples(index=False), total=len(subset), desc="Extracting PLY subset"):
+    for row in tqdm(
+        subset.itertuples(index=False), total=len(subset), desc="Extracting PLY subset"
+    ):
         point_id = str(row.id)
         output_path = output_dir / f"{point_id}.ply"
         if output_path.exists():
@@ -116,6 +139,70 @@ def extract_selected_pointclouds(subset: pd.DataFrame, raw_dir: Path, output_dir
     subset = subset.copy()
     subset["extracted"] = extracted_flags
     return subset
+
+
+def plot_splits_distr(
+    splits: dict[str, pd.DataFrame],
+    output_dir: Path,
+    label_column: str = "label_name",
+    filename: str = "splits_distribution.png",
+) -> Path:
+    """Plot per-class sample counts for each split and save the figure.
+
+    Produces a grouped bar chart (one bar group per class, one bar per split)
+    written to ``output_dir / filename``. Returns the path of the saved image.
+    """
+    if not splits:
+        raise ValueError("`splits` must contain at least one split.")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / filename
+
+    classes: list[str] = sorted(
+        {
+            str(value)
+            for frame in splits.values()
+            if label_column in frame.columns
+            for value in frame[label_column].astype(str).unique()
+        }
+    )
+    if not classes:
+        raise ValueError(f"None of the splits contain column `{label_column}`.")
+
+    split_names = list(splits.keys())
+    counts = np.zeros((len(split_names), len(classes)), dtype=int)
+    for row_idx, name in enumerate(split_names):
+        frame = splits[name]
+        if label_column not in frame.columns:
+            continue
+        series = frame[label_column].astype(str).value_counts()
+        counts[row_idx] = series.reindex(classes, fill_value=0).to_numpy(dtype=int)
+
+    x = np.arange(len(classes))
+    total_width = 0.8
+    bar_width = total_width / len(split_names)
+
+    fig, ax = plt.subplots(figsize=(max(8.0, 0.6 * len(classes) + 2.0), 5.0))
+    for row_idx, name in enumerate(split_names):
+        offset = (row_idx - (len(split_names) - 1) / 2.0) * bar_width
+        ax.bar(
+            x + offset,
+            counts[row_idx],
+            width=bar_width,
+            label=f"{name} (n={int(counts[row_idx].sum())})",
+        )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(classes, rotation=45, ha="right")
+    ax.set_xlabel("Class")
+    ax.set_ylabel("Samples")
+    ax.set_title("Per-class sample distribution by split")
+    ax.legend()
+    ax.grid(axis="y", linestyle=":", alpha=0.6)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+    return output_path
 
 
 def main() -> None:
@@ -157,7 +244,11 @@ def main() -> None:
     for split_name, split_df in splits.items():
         split_df.to_csv(args.splits_dir / f"{split_name}.csv", index=False)
         print(f"{split_name}: {len(split_df)} rows")
-    print(f"Extracted {int(available['extracted'].sum())}/{len(subset)} selected point clouds.")
+    image_path = plot_splits_distr(splits, args.images_dir)
+    print(f"Wrote split distribution plot: {image_path}")
+    print(
+        f"Extracted {int(available['extracted'].sum())}/{len(subset)} selected point clouds."
+    )
     print(f"Point-cloud root: {args.output_dir}")
     print(f"Split CSVs: {args.splits_dir}")
 

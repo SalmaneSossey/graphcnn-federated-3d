@@ -168,3 +168,20 @@ Loading restored checkpoint: checkpoints/rscnn_centralized.pt
 5. Wait for VFL, distillation, comparison metrics, and final backup to complete.
 6. Download the new final run from Drive and extract it locally.
 7. Update the final report using the real-data metrics.
+
+
+---
+
+
+Got this after training :
+
+
+| Configuration | Model | Test Loss | Test Accuracy | Parameters |
+| :--- | :--- | :---: | :---: | :---: |
+| **C1 Centralized** | PointGCN | 0.8340 | **76.33%** | 9,418 |
+| **C1 Centralized** | RS-CNN | 0.8946 | **71.67%** | 9,418 |
+| **C2 HFL IID** | PointGCN (FedAvg) | 2.2658 | **16.33%** | 9,418 |
+| **C3 HFL Non-IID** | PointGCN (FedAvg) | 2.2989 | **10.00%** | 9,418 |
+| **VFL Feature Split** | XYZ/RGB Embedding Concatenation | 0.8634 | **72.33%** | 17,738 |
+| **C4 Distillation** | Student (Alpha=0.5, Temp=4.0) | 1.7618 | **22.00%** | 826 |
+

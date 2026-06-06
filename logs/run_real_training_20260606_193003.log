@@ -1,0 +1,50 @@
+2026-06-06 19:30:03 | INFO    | Using device: cuda
+2026-06-06 19:30:03 | INFO    | Logging to: logs/run_real_training_20260606_193003.log
+2026-06-06 19:30:03 | INFO    | Detected num_classes=10
+2026-06-06 19:30:03 | INFO    | Dataset sizes | train=1400 val=300 test=300
+2026-06-06 19:30:03 | INFO    | >>> Phase 1: Training Centralized PointGCN <<<
+2026-06-06 19:30:04 | INFO    | [C1-PointGCN] Starting training: epochs=5 lr=0.001
+2026-06-06 19:32:43 | INFO    | [C1-PointGCN] Epoch 01/05 | Train Loss: 2.2953 | Val Acc: 0.1833 | Val MPCA: 0.1833 | Time: 159.52s
+2026-06-06 19:35:18 | INFO    | [C1-PointGCN] Epoch 02/05 | Train Loss: 2.1670 | Val Acc: 0.6167 | Val MPCA: 0.6167 | Time: 155.33s
+2026-06-06 19:37:56 | INFO    | [C1-PointGCN] Epoch 03/05 | Train Loss: 1.5706 | Val Acc: 0.6267 | Val MPCA: 0.6267 | Time: 157.77s
+2026-06-06 19:40:30 | INFO    | [C1-PointGCN] Epoch 04/05 | Train Loss: 1.0659 | Val Acc: 0.6867 | Val MPCA: 0.6867 | Time: 153.43s
+2026-06-06 19:43:03 | INFO    | [C1-PointGCN] Epoch 05/05 | Train Loss: 0.8764 | Val Acc: 0.8133 | Val MPCA: 0.8133 | Time: 153.34s
+2026-06-06 19:43:31 | INFO    | >>> Phase 1: Training Centralized RS-CNN <<<
+2026-06-06 19:43:31 | INFO    | [C1-RSCNN] Starting training: epochs=5 lr=0.001
+2026-06-06 19:46:10 | INFO    | [C1-RSCNN] Epoch 01/05 | Train Loss: 2.2825 | Val Acc: 0.3533 | Val MPCA: 0.3533 | Time: 158.90s
+2026-06-06 19:48:47 | INFO    | [C1-RSCNN] Epoch 02/05 | Train Loss: 2.0623 | Val Acc: 0.3933 | Val MPCA: 0.3933 | Time: 156.79s
+2026-06-06 19:51:31 | INFO    | [C1-RSCNN] Epoch 03/05 | Train Loss: 1.5140 | Val Acc: 0.6600 | Val MPCA: 0.6600 | Time: 164.79s
+2026-06-06 19:54:14 | INFO    | [C1-RSCNN] Epoch 04/05 | Train Loss: 1.1252 | Val Acc: 0.6800 | Val MPCA: 0.6800 | Time: 163.18s
+2026-06-06 19:56:56 | INFO    | [C1-RSCNN] Epoch 05/05 | Train Loss: 0.9417 | Val Acc: 0.7900 | Val MPCA: 0.7900 | Time: 161.72s
+2026-06-06 19:57:25 | INFO    | >>> Phase 2: Horizontal FL (IID Partitions) <<<
+2026-06-06 20:00:07 | INFO    | [HFL-IID] Round 01/03 | Val Acc: 0.1133 | Time: 162.41s
+2026-06-06 20:02:45 | INFO    | [HFL-IID] Round 02/03 | Val Acc: 0.1767 | Time: 157.50s
+2026-06-06 20:05:26 | INFO    | [HFL-IID] Round 03/03 | Val Acc: 0.1733 | Time: 161.91s
+2026-06-06 20:05:56 | INFO    | >>> Phase 3: Horizontal FL (Non-IID Partitions) <<<
+2026-06-06 20:08:37 | INFO    | [HFL-NonIID] Round 01/03 | Val Acc: 0.0367 | Time: 161.14s
+2026-06-06 20:11:21 | INFO    | [HFL-NonIID] Round 02/03 | Val Acc: 0.1000 | Time: 163.89s
+2026-06-06 20:14:12 | INFO    | [HFL-NonIID] Round 03/03 | Val Acc: 0.1000 | Time: 171.00s
+2026-06-06 20:14:42 | INFO    | >>> Phase 4: Vertical FL Simulation <<<
+2026-06-06 20:14:42 | INFO    | [VFL] Starting training: epochs=5 lr=0.001
+2026-06-06 20:17:28 | INFO    | [VFL] Epoch 01/05 | Train Loss: 2.2594 | Val Acc: 0.4567 | Val MPCA: 0.4567 | Time: 166.37s
+2026-06-06 20:20:16 | INFO    | [VFL] Epoch 02/05 | Train Loss: 1.9298 | Val Acc: 0.5400 | Val MPCA: 0.5400 | Time: 167.73s
+2026-06-06 20:22:57 | INFO    | [VFL] Epoch 03/05 | Train Loss: 1.3222 | Val Acc: 0.6133 | Val MPCA: 0.6133 | Time: 161.40s
+2026-06-06 20:25:42 | INFO    | [VFL] Epoch 04/05 | Train Loss: 1.0293 | Val Acc: 0.6900 | Val MPCA: 0.6900 | Time: 164.91s
+2026-06-06 20:28:26 | INFO    | [VFL] Epoch 05/05 | Train Loss: 0.8934 | Val Acc: 0.7433 | Val MPCA: 0.7433 | Time: 164.26s
+2026-06-06 20:28:57 | INFO    | >>> Phase 5: Knowledge Distillation <<<
+2026-06-06 20:31:45 | INFO    | [Distill] Epoch 01/05 | Loss: 3.4822 | Val Acc: 0.1633 | Time: 168.12s
+2026-06-06 20:34:33 | INFO    | [Distill] Epoch 02/05 | Loss: 3.4366 | Val Acc: 0.1200 | Time: 167.35s
+2026-06-06 20:37:20 | INFO    | [Distill] Epoch 03/05 | Loss: 3.3056 | Val Acc: 0.1667 | Time: 167.45s
+2026-06-06 20:40:11 | INFO    | [Distill] Epoch 04/05 | Loss: 2.9691 | Val Acc: 0.2200 | Time: 170.75s
+2026-06-06 20:43:08 | INFO    | [Distill] Epoch 05/05 | Loss: 2.3631 | Val Acc: 0.2300 | Time: 177.07s
+2026-06-06 20:43:38 | INFO    | =================== FINAL PERFORMANCE TABLE ===================
+2026-06-06 20:43:38 | INFO    |     configuration                           model  test_loss  test_accuracy  test_mpca  parameters
+2026-06-06 20:43:38 | INFO    |    C1 Centralized                        PointGCN   0.833967       0.763333   0.763333        9418
+2026-06-06 20:43:38 | INFO    |    C1 Centralized                          RS-CNN   0.894619       0.716667   0.716667        9418
+2026-06-06 20:43:38 | INFO    |        C2 HFL IID               PointGCN (FedAvg)   2.265759       0.163333   0.163333        9418
+2026-06-06 20:43:38 | INFO    |    C3 HFL Non-IID               PointGCN (FedAvg)   2.298892       0.100000   0.100000        9418
+2026-06-06 20:43:38 | INFO    | VFL Feature Split XYZ/RGB Embedding Concatenation   0.863447       0.723333   0.723333       17738
+2026-06-06 20:43:38 | INFO    |   C4 Distillation   Student (Alpha=0.5, Temp=4.0)   1.761812       0.220000   0.220000         826
+2026-06-06 20:43:38 | INFO    | ===============================================================
+2026-06-06 20:43:38 | INFO    | Results CSV: data/splits/local_comparison_results.csv
+2026-06-06 20:43:38 | INFO    | Total pipeline time: 4415.54s

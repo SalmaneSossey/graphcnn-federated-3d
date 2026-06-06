@@ -36,7 +36,7 @@ def deterministic_split(
     test_parts: list[pd.DataFrame] = []
 
     for _, group in dataframe.groupby(label_column):
-        indices = group.index.to_numpy()
+        indices = group.index.to_numpy().copy()
         rng.shuffle(indices)
         n_total = len(indices)
         n_train = int(round(n_total * fractions.train))
