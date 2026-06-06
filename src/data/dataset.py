@@ -10,7 +10,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.data.ply_utils import read_ply_xyzrgb
-from src.data.preprocessing import normalize_xyz, sample_points
+from src.data.preprocessing import augment_point_cloud, normalize_xyz, sample_points
 
 
 class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
@@ -18,8 +18,6 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
 
     Expected metadata path: `data/metadata/labeled_dataset.csv`.
     Expected point-cloud storage: `data/raw` or `data/cache`.
-
-    TODO: add train-time augmentation once baseline loading is verified.
     """
 
     def __init__(
@@ -30,6 +28,8 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         input_channels: int = 6,
         path_column: str | None = None,
         label_column: str | None = None,
+        augment: bool = False,
+        augment_kwargs: dict[str, Any] | None = None,
     ) -> None:
         self.metadata_csv = Path(metadata_csv)
         self.pointcloud_root = Path(pointcloud_root)
@@ -37,6 +37,8 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         self.input_channels = input_channels
         self.path_column = path_column
         self.label_column = label_column
+        self.augment = augment
+        self.augment_kwargs: dict[str, Any] = dict(augment_kwargs) if augment_kwargs else {}
         self.metadata = (
             pd.read_csv(self.metadata_csv) if self.metadata_csv.exists() else pd.DataFrame()
         )
@@ -70,6 +72,8 @@ class ShapeNetPointCloudDataset(Dataset[tuple[torch.Tensor, int]]):
         points = read_ply_xyzrgb(point_path)
         points = normalize_xyz(points)
         points = sample_points(points, self.num_points)
+        if self.augment:
+            points = augment_point_cloud(points, **self.augment_kwargs)
         if self.input_channels == 3:
             points = points[:, :3]
         elif self.input_channels != 6:
